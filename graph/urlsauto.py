@@ -2,5 +2,5 @@
 from django.conf.urls.defaults import *
 
 rootpatterns = patterns('',
-    (r'^person/', include('myapp.urls')),
+    (r'^graph/', include('graph.urls')),
 )
