@@ -7,8 +7,10 @@ from django.views.generic.create_update import create_object, delete_object, \
     update_object
 from django.views.generic.list_detail import object_list, object_detail
 from django.views.generic.simple import redirect_to, direct_to_template
+# TODO -- This will eventually be moved out of labs namespace
+from google.appengine.api.labs import taskqueue
 from google.appengine.ext import db
-from graph.models import Datapoint
+from graph.models import Datapoint, Follower
 from mimetypes import guess_type
 from ragendja.dbutils import get_object_or_404
 from ragendja.template import render_to_response
@@ -58,12 +60,42 @@ def process_messages(request):
 
         dp['metric'] = metric
         match = re.match("-?\d+(\.\d+)?", value.lstrip())
-        dp['numerical'] = float(match.group())
-        dp['annotation'] = value.lstrip()[match.end():].strip()
+        if match:
+            dp['numerical'] = float(match.group())
+            dp['annotation'] = value.lstrip()[match.end():].strip()
+        else:
+            logger.warn("Tweet " + str(tweet) + " improperly formatted")
+            continue
 
         Datapoint(**dp).put()
 
+    taskqueue.add(url=reverse('graph.views.process_messages'), method='GET', countdown=5)
+
     return direct_to_template(request, 'graph/messages.html', extra_context={'response_json': response})
+
+
+def update_followers(request):
+    url = 'http://twitter.com/followers/ids/%s.json' % ( settings.TWNAME )
+    install_opener()
+    response = simplejson.load(urllib2.urlopen(url))
+
+    followers = map(lambda f: f.user_id, Follower.all().fetch(5000))
+    follow_url = 'http://twitter.com/friendships/create.json?user_id=%s'
+    for new_follower in filter(lambda f: f not in followers, response):
+        success = simplejson.load(urllib2.urlopen(follow_url % (new_follower), ''))
+        if not success:
+            logger.warn("Could not follow %s" % (new_follower))
+            continue;
+
+        Follower(
+                user_id = new_follower,
+                screen_name = success['screen_name'],
+                ).put()
+
+    taskqueue.add(url=reverse('graph.views.update_followers'), method='GET', countdown=5)
+    return direct_to_template(request, 'graph/update_followers.html', 
+            extra_context={'response_json': response, 'followers': followers})
+
 
 def insert_test_messages(request,months):
     update = datetime.now()
@@ -79,6 +111,9 @@ def insert_test_messages(request,months):
                 ).put()
         update -= timedelta(1)
         mid += 1
+    return redirect_to(request, reverse('graph.views.user_metric_detail', 
+        kwargs=dict(screen_name='jimblomo', metric='test')))
+        
 
 def user_metric_detail(request, screen_name, metric):
     description = {
@@ -98,7 +133,8 @@ def user_metric_detail(request, screen_name, metric):
                 'table_json': jscode,
                 'metric': metric,
                 'screen_name': screen_name,
-                'most_recent': Datapoint.all().filter('sender_screen_name =', screen_name).filter('metric = ', metric).order('-created_at').get(),
+                'data_length': len(data),
+                'most_recent': data.pop() if data else None,
                 })
     
 # def add_person(request):

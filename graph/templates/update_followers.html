@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block title %}DMs{% endblock %}
+
+{% block content %}
+<h1>New DMs</h1>
+<pre>
+<ul>
+<h3>Twitter</h3>
+{% for user_id in response_json %}
+<li>{{ user_id }}</li>
+{% endfor %}
+<h3>Existing</h3>
+{% for user_id in followers %}
+<li>{{ user_id }}</li>
+{% endfor %}
+</ul>
+</pre>
+{% endblock %}

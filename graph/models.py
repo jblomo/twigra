@@ -20,6 +20,15 @@ class Datapoint(db.Model):
     def get_absolute_url(self):
         return ('myapp.views.show_datapoint', (), {'key': self.key()})
 
+class Follower(db.Model):
+    """List of follower IDs"""
+    user_id = db.IntegerProperty(required=True)
+    screen_name = db.StringProperty(required=True)
+    created_at  = db.DateTimeProperty(None, False, True, required=True)
+
+    def __unicode__(self):
+        return '%s (%s)' % (self.screen_name, self.user_id)
+
 # signals.pre_delete.connect(cleanup_relations, sender=Person)
 # 
 # class File(db.Model):

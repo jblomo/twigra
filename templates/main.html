@@ -137,14 +137,14 @@ jscode_data.setCell(56, 2, 'crab dinner with the family');
 
 {% block content %}
 <div id="instructions" class="span-24 last">
-	<div>
-		<h2 class="app_title">twigra</h2><h5 class="app_title">  tweet powered graphs</h5>
-	</div>
+	<h2 class="app_title" style="margin-left: 0.3em;">twigra</h2><span class="app_title"> tweet powered graphs</span>
 	<ol>
-		<li><a href="http://www.twitter.com/twigra" style="text-decoration: none;">Follow @twigra
+		<li><a href="http://www.twitter.com/twigra" target="_blank">Follow 
+			<span style="text-decoration: underline;">@twigra</span>
 			<img src="{{ MEDIA_URL }}global/follow_dots.png" alt="" />
 			<img src="{{ MEDIA_URL }}global/twigra_logo.png" alt="" width="150" height="116" />
-		</a></li>
+		</a>
+		</li>
 
 		<li>Direct message @twigra numbers for your graph
 		<img src="{{ MEDIA_URL }}global/example_tweet.png" alt="" class="span-12" style="float: left; padding-right: 1em; padding-bottom: 2em;"/>
@@ -160,13 +160,11 @@ jscode_data.setCell(56, 2, 'crab dinner with the family');
 			<input name="screen_name" id="screen_name" value="twitter name" onFocus="this.select()" maxlength="20"/>
 			and the
 			<input name="metric" id="metric" value="metric" onFocus="this.select()" maxlength="20" /> you
-			messaged, like mood. <button onClick="direct_to_metrics();;">Go!</button>
+			tweeted, like mood. <button onClick="direct_to_metrics();;">Go!</button>
 			<div id="go_error"></div>
 		</div>
 		<div id="chart_div" class="span-13 last" style="height: 250px; float: right;"></div></li>
 </div>
-<hr/>
-<div class="span-24 last">About | Copyright 2010 | Feedback</div>
 
 <script>
 	function direct_to_metrics() {

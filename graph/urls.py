@@ -6,7 +6,7 @@ urlpatterns = patterns('graph.views',
     (r'^process_messages$', 'process_messages'),
     (r'^insert_test_messages/(?P<months>\d+)$', 'insert_test_messages'),
     (r'^atimeline/(?P<screen_name>.+)/(?P<metric>.+)$', 'user_metric_detail'),
-    # (r'^edit/(?P<key>.+)$', 'edit_person'),
+    (r'^update_followers$', 'update_followers'),
     # (r'^delete/(?P<key>.+)$', 'delete_person'),
     # (r'^download/(?P<key>.+)/(?P<name>.+)$', 'download_file'),
 )

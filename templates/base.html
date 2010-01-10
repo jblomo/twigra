@@ -37,6 +37,10 @@
 		      color: #23415A;
 		      background: url(/generated_media/media/1/global/chart_bg.png);
 	      }
+	      #instructions a {
+		      color: #23415A;
+		      text-decoration: none;
+	      }
 	      #instructions ol {
 		      margin-top: -3em;
 	      }
@@ -49,7 +53,7 @@
 		      border-left:none;
 		      border-right:none;
 		      text-align: center;
-		      font-size: medium;
+		      font-size: small;
 		      width: 10em;
 	      }
 	      #instructions button {
@@ -68,6 +72,10 @@
 		      border: 2px solid MidnightBlue;
 		      margin-top: 3em;
 	      }
+	      #footer {
+		      text-align: center;
+	      }
+
 	      .annotatedtimelinetable * {
 		      padding: 0px;
 		      margin: 0px;
@@ -104,6 +112,8 @@
         {% endif %}
       {% endblock %}
       {% block content %}{% endblock %}
+      <hr/>
+      <div id="footer" class="span-24 last">About | Copyright 2010 | Feedback</div>
     </div>
   </body>
 </html>
