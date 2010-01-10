@@ -133,7 +133,7 @@ def user_metric_detail(request, screen_name, metric):
                 'table_json': jscode,
                 'metric': metric,
                 'screen_name': screen_name,
-                'data_length': len(data),
+                'not_much_data': data[0]['created_at'] > datetime.now()-timedelta(3),
                 'most_recent': data.pop() if data else None,
                 })
     
