@@ -18,7 +18,7 @@ from gviz_api import gviz_api
 import logging
 import random
 import re
-import simplejson
+from django.utils import simplejson
 from datetime import datetime, timedelta
 import urllib2
 
