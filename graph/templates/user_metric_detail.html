@@ -1,22 +1,26 @@
-<html>
-  <script src="http://www.google.com/jsapi" type="text/javascript"></script>
-  <script>
-		google.load('visualization', '1', {'packages':['annotatedtimeline']});
-		
-		google.setOnLoadCallback(drawChart);
-		
-    function drawChart() {
-			{{ table_json|safe }}
-      //var jscode_table = new google.visualization.Table(document.getElementById('table_div_jscode'));
-			var chart = new google.visualization.AnnotatedTimeLine(document.getElementById('chart_div'));
-      //jscode_table.draw(jscode_data, {showRowNumber: true});
-			chart.draw(jscode_data, {displayAnnotations: true});
-    }
-  </script>
-  <body>
-		<h1>Annotated Timeline of {{ metric }} for {{ screen_name }}</h1>
-		<div id='chart_div' style='width: 700px; height: 240px;'></div>
-		end
-  </body>
-</html>
+{% extends 'base.html' %}
+{% block title %}{{ metric }} {{ screen_name }} Timeline{% endblock %}
+
+{% block js %}
+<script src="http://www.google.com/jsapi" type="text/javascript"></script>
+<script>
+	google.load('visualization', '1', {'packages':['annotatedtimeline']});
+
+	google.setOnLoadCallback(drawChart);
+
+	function drawChart() {
+		{{ table_json|safe }}
+		//var jscode_table = new google.visualization.Table(document.getElementById('table_div_jscode'));
+		var chart = new google.visualization.AnnotatedTimeLine(document.getElementById('chart_div'));
+		//jscode_table.draw(jscode_data, {showRowNumber: true});
+		chart.draw(jscode_data, {displayAnnotations: true});
+	}
+</script>
+{% endblock %}
+
+{% block content %}
+<h1 class="metric">Annotated Timeline of {{ metric }} for {{ screen_name }}</h1>
+<div id="chart_div" class="span-19" style="height: 250px"></div>
+<div class="span-19">Last tweet processed: {{ most_recent }}</div>
+{% endblock %}
 

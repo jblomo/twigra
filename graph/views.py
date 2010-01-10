@@ -98,6 +98,7 @@ def user_metric_detail(request, screen_name, metric):
                 'table_json': jscode,
                 'metric': metric,
                 'screen_name': screen_name,
+                'most_recent': Datapoint.all().filter('sender_screen_name =', screen_name).filter('metric = ', metric).order('-created_at').get(),
                 })
     
 # def add_person(request):
