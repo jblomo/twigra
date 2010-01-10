@@ -2,6 +2,7 @@
 {% block title %}twigra - tweet powered graphs{% endblock %}
 
 {% block js %}
+<script type="text/javascript" src="{{ MEDIA_URL }}combined-{{ LANGUAGE_CODE }}.js"></script>
 <script src="http://www.google.com/jsapi" type="text/javascript"></script>
 <script>
 	google.load('visualization', '1', {'packages':['annotatedtimeline']});
@@ -132,8 +133,13 @@ jscode_data.setCell(56, 2, 'crab dinner with the family');
 </script>
 {% endblock %}
 
+{% block header %}{% endblock %}
+
 {% block content %}
-<div class="instructions span-24 last">
+<div id="instructions" class="span-24 last">
+	<div>
+		<h2 class="app_title">twigra</h2><h5 class="app_title">  tweet powered graphs</h5>
+	</div>
 	<ol>
 		<li><a href="http://www.twitter.com/twigra" style="text-decoration: none;">Follow @twigra
 			<img src="{{ MEDIA_URL }}global/follow_dots.png" alt="" />
@@ -142,22 +148,35 @@ jscode_data.setCell(56, 2, 'crab dinner with the family');
 
 		<li>Direct message @twigra numbers for your graph
 		<img src="{{ MEDIA_URL }}global/example_tweet.png" alt="" class="span-12" style="float: left; padding-right: 1em; padding-bottom: 2em;"/>
-		<div class="span-8" style="font-size: medium;">The format is
-			easy: just put in what you're measuring (like 'mood'), a
+		<div class="span-9" style="font-size: medium; padding-top: 2em;">The format is
+			easy: just type in what you're measuring (like 'mood'), a
 			colon (':'), a numeric score (10) and optionally any
 			info you want to display in the graph.</div>
 		</li>
 
 		<li style="clear: left;">Check out your graphs!<br/>
-		<div class="span-8" style="font-size: medium;">You can see your
+		<div class="span-9" style="font-size: medium; padding-top: 2em;">You can see your
 			stats by typing in your 
-			<input name="screen_name" id="scren_name" value="twitter name" maxlength="20"/>
+			<input name="screen_name" id="screen_name" value="twitter name" onFocus="this.select()" maxlength="20"/>
 			and the
-			<input name="metric" id="metric" value="metric" maxlength="20" /> you
-			messaged, like mood.
+			<input name="metric" id="metric" value="metric" onFocus="this.select()" maxlength="20" /> you
+			messaged, like mood. <button onClick="direct_to_metrics();;">Go!</button>
+			<div id="go_error"></div>
 		</div>
 		<div id="chart_div" class="span-13 last" style="height: 250px; float: right;"></div></li>
 </div>
 <hr/>
 <div class="span-24 last">About | Copyright 2010 | Feedback</div>
+
+<script>
+	function direct_to_metrics() {
+		if( $('#screen_name').val() == 'twitter name' ) {
+			$('#go_error').html('Type in your Twitter screen name above');
+			$('#go_error').addClass('error');
+		} else {
+			window.location = '/graph/atimeline/' + $('#screen_name').val() + '/' + $('#metric').val();
+		}
+	}
+</script>
+
 {% endblock %}
