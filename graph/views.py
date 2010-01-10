@@ -55,7 +55,7 @@ def process_messages(request):
 
         (metric, sep, value) = tweet['text'].partition(':')
         if sep != ':':
-            logger.warn("Tweet " + str(tweet) + " improperly formatted")
+            logging.warn("Tweet " + str(tweet) + " improperly formatted")
             continue
 
         dp['metric'] = metric
@@ -64,7 +64,7 @@ def process_messages(request):
             dp['numerical'] = float(match.group())
             dp['annotation'] = value.lstrip()[match.end():].strip()
         else:
-            logger.warn("Tweet " + str(tweet) + " improperly formatted")
+            logging.warn("Tweet " + str(tweet) + " improperly formatted")
             continue
 
         Datapoint(**dp).put()
@@ -84,7 +84,7 @@ def update_followers(request):
     for new_follower in filter(lambda f: f not in followers, response):
         success = simplejson.load(urllib2.urlopen(follow_url % (new_follower), ''))
         if not success:
-            logger.warn("Could not follow %s" % (new_follower))
+            logging.warn("Could not follow %s" % (new_follower))
             continue;
 
         Follower(
