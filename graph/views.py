@@ -24,13 +24,13 @@ import urllib2
 
 def install_opener():
     password_mgr = urllib2.HTTPPasswordMgrWithDefaultRealm()
-    password_mgr.add_password(None, 'http://twitter.com/', settings.TWNAME, settings.TWPASSWORD)
+    password_mgr.add_password(None, 'https://twitter.com/', settings.TWNAME, settings.TWPASSWORD)
     handler = urllib2.HTTPBasicAuthHandler(password_mgr)
     opener = urllib2.build_opener(urllib2.HTTPHandler, handler)
     urllib2.install_opener(opener)
 
 def list_messages(request):
-    url = 'http://twitter.com/direct_messages.json'
+    url = 'https://twitter.com/direct_messages.json'
     install_opener()
     response = simplejson.load(urllib2.urlopen(url))
     logging.info("loaded " + str(response))
@@ -42,7 +42,7 @@ def show_datapoint(request, key):
 
 def process_messages(request):
     most_recent = Datapoint.all().order('-created_at').get()
-    url = 'http://twitter.com/direct_messages.json?since_id=%u' % (most_recent.message_id if most_recent else 0)
+    url = 'https://twitter.com/direct_messages.json?since_id=%u' % (most_recent.message_id if most_recent else 0)
     install_opener()
     response = simplejson.load(urllib2.urlopen(url))
 
@@ -69,18 +69,18 @@ def process_messages(request):
 
         Datapoint(**dp).put()
 
-    taskqueue.add(url=reverse('graph.views.process_messages'), method='GET', countdown=5)
+    taskqueue.add(url=reverse('graph.views.process_messages'), method='GET', countdown=10)
 
     return direct_to_template(request, 'graph/messages.html', extra_context={'response_json': response})
 
 
 def update_followers(request):
-    url = 'http://twitter.com/followers/ids/%s.json' % ( settings.TWNAME )
+    url = 'https://twitter.com/followers/ids/%s.json' % ( settings.TWNAME )
     install_opener()
     response = simplejson.load(urllib2.urlopen(url))
 
     followers = map(lambda f: f.user_id, Follower.all().fetch(5000))
-    follow_url = 'http://twitter.com/friendships/create.json?user_id=%s'
+    follow_url = 'https://twitter.com/friendships/create.json?user_id=%s'
     for new_follower in filter(lambda f: f not in followers, response):
         success = simplejson.load(urllib2.urlopen(follow_url % (new_follower), ''))
         if not success:
@@ -92,7 +92,7 @@ def update_followers(request):
                 screen_name = success['screen_name'],
                 ).put()
 
-    taskqueue.add(url=reverse('graph.views.update_followers'), method='GET', countdown=5)
+    taskqueue.add(url=reverse('graph.views.update_followers'), method='GET', countdown=10)
     return direct_to_template(request, 'graph/update_followers.html', 
             extra_context={'response_json': response, 'followers': followers})
 
