@@ -115,27 +115,29 @@ def insert_test_messages(request,months):
         kwargs=dict(screen_name='jimblomo', metric='test')))
         
 
-def user_metric_detail(request, screen_name, metric):
-    description = {
-            "created_at": ("Date", "date"),
-            "numerical": ("number", metric),
-            "title1": ("string", "Annotation")}
-    data = []
-    for datapoint in Datapoint.all().filter('sender_screen_name =', screen_name).filter('metric = ', metric).order('created_at'):
-        data.append({'created_at': datapoint.created_at, 'numerical': datapoint.numerical, 'title1': datapoint.annotation})
+def user_metric_detail(request, screen_name, metric, json=False):
+    if(json):
+        description = {
+                "created_at": ("datetime", "date"),
+                "numerical": ("number", metric),
+                "title1": ("string", "Annotation")}
+        data = []
+        for datapoint in Datapoint.all().filter('sender_screen_name =', screen_name).filter('metric = ', metric).order('created_at'):
+            data.append({'created_at': datapoint.created_at, 'numerical': datapoint.numerical, 'title1': datapoint.annotation})
 
-    data_table = gviz_api.DataTable(description)
-    data_table.LoadData(data)
-    jscode = data_table.ToJSCode("jscode_data", columns_order=("created_at", "numerical", "title1"))
+        data_table = gviz_api.DataTable(description)
+        data_table.LoadData(data)
+        json = data_table.ToJSonResponse(columns_order=("created_at", "numerical", "title1"))
 
-    return direct_to_template(request, 'graph/user_metric_detail.html', 
+        return HttpResponse(json, mimetype='application/json')
+    else:
+        return direct_to_template(request, 'graph/user_metric_detail.html', 
             extra_context={
-                'table_json': jscode,
                 'metric': metric,
                 'screen_name': screen_name,
-                'not_much_data': data[0]['created_at'] > datetime.now()-timedelta(3) if data else True,
-                'most_recent': data.pop() if data else None,
-                })
+                'not_much_data': Datapoint.all().filter('sender_screen_name =', screen_name).filter('metric = ', metric).order('created_at').count(5) < 3,
+                'most_recent': Datapoint.all().filter('sender_screen_name =', screen_name).filter('metric = ', metric).order('created_at').get()
+            })
     
 # def add_person(request):
 #     return create_object(request, form_class=PersonForm,

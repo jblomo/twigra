@@ -9,11 +9,10 @@
 	google.setOnLoadCallback(drawChart);
 
 	function drawChart() {
-		{{ table_json|safe }}
-		//var jscode_table = new google.visualization.Table(document.getElementById('table_div_jscode'));
 		var chart = new google.visualization.AnnotatedTimeLine(document.getElementById('chart_div'));
-		//jscode_table.draw(jscode_data, {showRowNumber: true});
-		chart.draw(jscode_data, {displayAnnotations: true});
+		new google.visualization.Query(location.href + '.json').send(function(response) {
+			chart.draw(response.getDataTable(), {displayAnnotations: true});
+		});
 	}
 </script>
 {% endblock %}
