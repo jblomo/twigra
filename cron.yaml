@@ -1,0 +1,8 @@
+cron:
+- description: recipricate followers
+  url: /graph/update_followers
+  schedule: every 1 minutes
+- description: store incoming direct messages
+  url: /graph/process_messages
+  schedule: every 1 minutes
+

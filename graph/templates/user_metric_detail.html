@@ -11,7 +11,7 @@
 	function drawChart() {
 		var chart = new google.visualization.AnnotatedTimeLine(document.getElementById('chart_div'));
 		new google.visualization.Query(location.href + '.json').send(function(response) {
-			chart.draw(response.getDataTable(), {displayAnnotations: true});
+			chart.draw(response.getDataTable(), {displayAnnotations: true, thickness: 4});
 		});
 	}
 </script>

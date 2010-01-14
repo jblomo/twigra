@@ -8,7 +8,6 @@ from django.views.generic.create_update import create_object, delete_object, \
 from django.views.generic.list_detail import object_list, object_detail
 from django.views.generic.simple import redirect_to, direct_to_template
 # TODO -- This will eventually be moved out of labs namespace
-from google.appengine.api.labs import taskqueue
 from google.appengine.ext import db
 from graph.models import Datapoint, Follower
 from mimetypes import guess_type
@@ -69,8 +68,6 @@ def process_messages(request):
 
         Datapoint(**dp).put()
 
-    taskqueue.add(url=reverse('graph.views.process_messages'), method='GET', countdown=10)
-
     return direct_to_template(request, 'graph/messages.html', extra_context={'response_json': response})
 
 
@@ -92,7 +89,6 @@ def update_followers(request):
                 screen_name = success['screen_name'],
                 ).put()
 
-    taskqueue.add(url=reverse('graph.views.update_followers'), method='GET', countdown=10)
     return direct_to_template(request, 'graph/update_followers.html', 
             extra_context={'response_json': response, 'followers': followers})
 
