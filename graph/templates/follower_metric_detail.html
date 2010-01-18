@@ -19,7 +19,7 @@
 
 {% block content %}
 <h1 class="metric">@{{ follower.screen_name }} timeline for {{ metric }}</h1>
-<div id="info" class="span-6">
+<div id="info" class="span-6" style="margin-right: 0px">
 	<div id="other_metrics" class="span-6 last">
 		<h3><a href="{% url graph.views.follower_detail follower.screen_name %}">
 				Other Metrics
