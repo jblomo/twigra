@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% block title %}{{ metric }} {{ follower.screen_name }} Timeline{% endblock %}
+{% block title %}Graph not found yet{% endblock %}
 
 {% block js %}
 <script src="http://www.google.com/jsapi" type="text/javascript"></script>
@@ -19,7 +19,8 @@
 
 {% block content %}
 <h1 class="metric">Want a cool graph like this one?</h1>
-<div id="info" class="span-6">
+<h3 class="metric">1. Follow <a href="http://twitter.com/twigra">@twigra</a>&nbsp; 2. Tweet "d twigra {{ metric }}: 10 my first {{ metric }}"&nbsp; 3. Check back here</h3>
+<div id="info" class="span-6" style="margin-right: 0px;">
 
 	<div class="notice span-5 last">
 		<strong>Where's my graph?</strong> Uh oh, it looks like @twigra hasn't

@@ -169,7 +169,7 @@ def follower_metric_detail(request, screen_name, metric):
                 'most_recent':   Datapoint.all().filter('follower =', follower).filter('metric = ', metric.lower()).order('created_at').get()
             })
     else:
-        return direct_to_template(request, 'graph/follower_404.html')
+        return direct_to_template(request, 'graph/follower_404.html', extra_context={'metric':metric})
 
 
 def follower_detail(request, screen_name, json=False):
