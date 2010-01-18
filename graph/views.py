@@ -12,6 +12,7 @@ from django.views.generic.simple import redirect_to, direct_to_template
 from google.appengine.ext import db
 from graph.models import Datapoint, Follower
 from mimetypes import guess_type
+from ragendja.auth.decorators import staff_only
 from ragendja.dbutils import get_object_or_404
 from ragendja.template import render_to_response
 from gviz_api import gviz_api
@@ -112,8 +113,13 @@ def update_followers(request):
             extra_context={'response_json': response, 'followers': followers})
 
 
+@staff_only
 def insert_test_messages(request,months):
-    update = datetime.now()
+    if int(months) < 0:
+        logging.info("trying to delete every datapoint")
+        db.delete(Datapoint.all(keys_only=True).fetch(5000))
+
+    update = datetime.now() - timedelta(7)
     mid = 0
     follower = Follower.all().filter('screen_name = ', 'jimblomo').get()
     while update > datetime.now() - timedelta(int(months)*30):
