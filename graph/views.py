@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.core import serializers
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, Http404
 from django.views.generic.create_update import create_object, delete_object, \
@@ -48,7 +49,7 @@ def process_messages(request):
     for tweet in response:
         dp = dict(
             message_id = tweet['id'],
-            sender_screen_name = tweet['sender_screen_name'],
+            sender_screen_name = tweet['sender_screen_name'].lower(),
             created_at = datetime.strptime(tweet['created_at'], "%a %b %d %H:%M:%S +0000 %Y"),
         )
 
@@ -57,7 +58,8 @@ def process_messages(request):
             logging.warn("Tweet " + str(tweet) + " improperly formatted")
             continue
 
-        dp['metric'] = metric
+        dp['metric'] = metric.lower()
+
         match = re.match("-?\d+(\.\d+)?", value.lstrip())
         if match:
             dp['numerical'] = float(match.group())
@@ -66,27 +68,44 @@ def process_messages(request):
             logging.warn("Tweet " + str(tweet) + " improperly formatted")
             continue
 
+        follower = Follower.get_or_insert(str(tweet['sender']['id']),
+                use_id = tweet['sender']['id'],
+                screen_name = tweet['sender_screen_name'].lower(),
+                metrics = [dp['metric']])
+        if dp['metric'] not in follower.metrics:
+            follower.metrics.append(dp['metric'])
+            follower.put()
+        dp['follower'] = follower
+
         Datapoint(**dp).put()
 
     return direct_to_template(request, 'graph/messages.html', extra_context={'response_json': response})
 
 
 def update_followers(request):
-    url = 'https://twitter.com/followers/ids/%s.json' % ( settings.TWNAME )
-    install_opener()
+    url = 'http://twitter.com/followers/ids/%s.json' % ( settings.TWNAME )
+    # don't need authentication for followers
     response = simplejson.load(urllib2.urlopen(url))
+    install_opener()
 
-    followers = map(lambda f: f.user_id, Follower.all().fetch(5000))
+    followers = map(lambda k: int(k.name()), Follower.all(keys_only=True).fetch(5000))
     follow_url = 'https://twitter.com/friendships/create.json?user_id=%s'
+    show_user_url = 'http://twitter.com/users/show.json?user_id=%s'
     for new_follower in filter(lambda f: f not in followers, response):
-        success = simplejson.load(urllib2.urlopen(follow_url % (new_follower), ''))
+        try:
+            success = simplejson.load(urllib2.urlopen(follow_url % (new_follower), ''))
+        except urllib2.HTTPError, e:
+            if hasattr(e, 'code') and e.code == 403:
+                logging.warn("Apparently we're already following %s, just getting info" % (new_follower))
+                success = simplejson.load(urllib2.urlopen(show_user_url % (new_follower)))
+
         if not success:
             logging.warn("Could not follow %s" % (new_follower))
             continue;
 
-        Follower(
+        Follower( key_name = str(new_follower),
                 user_id = new_follower,
-                screen_name = success['screen_name'],
+                screen_name = success['screen_name'].lower(),
                 ).put()
 
     return direct_to_template(request, 'graph/update_followers.html', 
@@ -96,29 +115,32 @@ def update_followers(request):
 def insert_test_messages(request,months):
     update = datetime.now()
     mid = 0
+    follower = Follower.all().filter('screen_name = ', 'jimblomo').get()
     while update > datetime.now() - timedelta(int(months)*30):
         Datapoint(
                 message_id = mid,
                 sender_screen_name = 'jimblomo',
+                follower = follower,
                 metric = 'test',
-                numerical = float(random.randrange(-100,100)),
+                numerical = float(random.randrange(1,10)),
                 created_at = update,
-                annotation = 'annotation' if random.randrange(-100,100) % 7 == 0 else '',
+                annotation = 'annotation' if random.randrange(1,10) % 7 == 0 else '',
                 ).put()
         update -= timedelta(1)
         mid += 1
-    return redirect_to(request, reverse('graph.views.user_metric_detail', 
+    return redirect_to(request, reverse('graph.views.follower_metric_detail', 
         kwargs=dict(screen_name='jimblomo', metric='test')))
         
 
-def user_metric_detail(request, screen_name, metric, json=False):
-    if(json):
+def follower_metric_detail_json(request, screen_name, metric):
+    follower = Follower.all().filter('screen_name = ', screen_name.lower()).get()
+    if follower:
         description = {
                 "created_at": ("datetime", "date"),
                 "numerical": ("number", metric),
                 "title1": ("string", "Annotation")}
         data = []
-        for datapoint in Datapoint.all().filter('sender_screen_name =', screen_name).filter('metric = ', metric).order('created_at'):
+        for datapoint in Datapoint.all().filter('follower =', follower).filter('metric = ', metric.lower()).order('created_at'):
             data.append({'created_at': datapoint.created_at, 'numerical': datapoint.numerical, 'title1': datapoint.annotation})
 
         data_table = gviz_api.DataTable(description)
@@ -127,43 +149,60 @@ def user_metric_detail(request, screen_name, metric, json=False):
 
         return HttpResponse(json, mimetype='application/json')
     else:
-        return direct_to_template(request, 'graph/user_metric_detail.html', 
+        raise Http404
+
+
+def follower_metric_detail(request, screen_name, metric):
+    follower = Follower.all().filter('screen_name = ', screen_name.lower()).get()
+    if follower:
+        return direct_to_template(request, 'graph/follower_metric_detail.html', 
             extra_context={
                 'metric': metric,
-                'screen_name': screen_name,
-                'not_much_data': Datapoint.all().filter('sender_screen_name =', screen_name).filter('metric = ', metric).order('created_at').count(5) < 3,
-                'most_recent': Datapoint.all().filter('sender_screen_name =', screen_name).filter('metric = ', metric).order('created_at').get()
+                'follower': follower,
+                'not_much_data': Datapoint.all().filter('follower =', follower).filter('metric = ', metric.lower()).order('created_at').count(5) < 3,
+                'most_recent':   Datapoint.all().filter('follower =', follower).filter('metric = ', metric.lower()).order('created_at').get()
             })
+    else:
+        return direct_to_template(request, 'graph/follower_404.html')
+
+
+def follower_detail(request, screen_name, json=False):
+    follower = Follower.all().filter('screen_name = ', screen_name.lower()).get()
+    if follower:
+        dp_of_follower = Datapoint.all().filter('follower = ', follower)
+        if json:
+            data = []
+            current_value = {}
+            display_metrics = set()
+            recent_metrics = dp_of_follower.order('-created_at').fetch(500)
+            recent_metrics.reverse()
+            for datapoint in recent_metrics:
+                display_metrics.add(datapoint.metric)
+                current_value[datapoint.metric] = datapoint.numerical
+                data.append(current_value.copy())
+
+            description = {}
+            for metric_name in display_metrics:
+                description[metric_name] = ('number', metric_name)
     
-# def add_person(request):
-#     return create_object(request, form_class=PersonForm,
-#         post_save_redirect=reverse('myapp.views.show_person',
-#                                    kwargs=dict(key='%(key)s')))
-# 
-# def edit_person(request, key):
-#     return update_object(request, object_id=key, form_class=PersonForm,
-#         post_save_redirect=reverse('myapp.views.show_person',
-#                                    kwargs=dict(key='%(key)s')))
-# 
-# def delete_person(request, key):
-#     return delete_object(request, Person, object_id=key,
-#         post_delete_redirect=reverse('myapp.views.list_people'))
-# 
-# def download_file(request, key, name):
-#     file = get_object_or_404(File, key)
-#     if file.name != name:
-#         raise Http404('Could not find file with this name!')
-#     return HttpResponse(file.file,
-#         content_type=guess_type(file.name)[0] or 'application/octet-stream')
-# 
-# def create_admin_user(request):
-#     user = User.get_by_key_name('admin')
-#     if not user or user.username != 'admin' or not (user.is_active and
-#             user.is_staff and user.is_superuser and
-#             user.check_password('admin')):
-#         user = User(key_name='admin', username='admin',
-#             email='admin@localhost', first_name='Boss', last_name='Admin',
-#             is_active=True, is_staff=True, is_superuser=True)
-#         user.set_password('admin')
-#         user.put()
-#     return render_to_response(request, 'myapp/admin_created.html')
+            data_table = gviz_api.DataTable(description)
+            data_table.LoadData(data)
+            json = data_table.ToJSonResponse()
+    
+            return HttpResponse(json, mimetype='application/json')
+        else:
+            last_metrics = {}
+            for metric in follower.metrics:
+                last = Datapoint.all().filter('follower = ', follower).filter('metric = ', metric).order('-created_at').get()
+                last_metrics[metric] = {
+                        'created_at': last.created_at.isoformat(), 
+                        'numerical': last.numerical, 
+                        'annotation': last.annotation }
+
+            return direct_to_template(request, 'graph/follower_detail.html', extra_context = { 
+                'object': follower, 
+                'last_metrics': simplejson.dumps(last_metrics)
+                })
+    else:
+        return direct_to_template(request, 'graph/follower_404.html', extra_context={ 'screen_name' : screen_name })
+    

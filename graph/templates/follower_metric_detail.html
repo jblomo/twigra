@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+{% block title %}{{ metric }} {{ follower.screen_name }} Timeline{% endblock %}
+
+{% block js %}
+<script src="http://www.google.com/jsapi" type="text/javascript"></script>
+<script>
+	google.load('visualization', '1', {'packages':['annotatedtimeline']});
+
+	google.setOnLoadCallback(drawChart);
+
+	function drawChart() {
+		var chart = new google.visualization.AnnotatedTimeLine(document.getElementById('chart_div'));
+		new google.visualization.Query(location.href + '.json').send(function(response) {
+			chart.draw(response.getDataTable(), {displayAnnotations: true, thickness: 4});
+		});
+	}
+</script>
+{% endblock %}
+
+{% block content %}
+<h1 class="metric">@{{ follower.screen_name }} timeline for {{ metric }}</h1>
+<div id="info" class="span-6">
+	<div id="other_metrics" class="span-6 last">
+		<h3><a href="{% url graph.views.follower_detail follower.screen_name %}">
+				Other Metrics
+		</a></h3>
+		<ul>
+			{% for ometric in follower.metrics %}
+			<li>
+			{% ifequal metric ometric %}
+			<strong>{{ ometric }}</strong>
+			{% else %}
+			<a href="{% url graph.views.follower_metric_detail follower.screen_name, ometric %}">
+				{{ ometric }}
+			</a>
+			{% endifequal %}
+			</li>
+			{% endfor %}
+			<li><a href="{% url graph.views.follower_detail follower.screen_name %}">
+				All...
+			</a></li>
+		</ul>
+	</div>
+
+	{% if most_recent %}
+
+	{% if not_much_data %}
+	<div class="notice span-5 last">
+		<strong style="font-size: larger;">Where's my graph?</strong> Congradulations,
+		you've stared graphing with twigra!  Since you <strong>only have a few data
+			points</strong>, your graph may look incomplete, but
+		don't worry!  After a few more you'll have a graph that would
+		make Tufte green with envy.
+	</div>
+	{% endif %}
+
+	{% else %}
+	<div class="notice span-5 last">
+		<strong>Where's my graph?</strong> Uh oh, it looks like @twigra hasn't
+		processed any direct messages from you with your graph data.  Try reading the
+		<a href="/">instructions</a> again or emailing Jim.</div>
+
+	{% endif %}
+</div>
+
+<div id="chart_div" class="span-18 last" style="height: 250px">
+	<img src="{{ MEDIA_URL}}global/spinner.gif" alt="Loading graphs">Loading
+	graphs
+</div>
+<div class="span-23" style="text-align: right;">Last tweet processed: {{ most_recent }}</div>
+
+{% endblock %}
+

@@ -64,7 +64,6 @@
 	      #header {
 		      background-color: white;
 		      border: 2px solid MidnightBlue;
-		      height:116px;
 		      padding-top: 0.5em;
 	      }
 	      #content {
@@ -80,6 +79,29 @@
 		      padding: 0px;
 		      margin: 0px;
 	      }
+	      tr.google-visualization-sparkline-default {
+		      color: Black;
+	      }
+
+	      tr.google-visualization-sparkline-default:hover {
+	      }
+
+	      tr.google-visualization-sparkline-default td div {
+		      display: none
+	      }
+
+	      tr.google-visualization-sparkline-default:hover td div { 
+		      display:block;
+	      }
+	      tr.google-visualization-sparkline-default:hover td div span { 
+		      z-index:10; 
+		      position:absolute;
+		      top:-1em; width:15em;
+		      overflow: hidden;
+		      background: AliceBlue none repeat scroll 0 0;
+		      border: 1px solid MidnightBlue;
+	      }
+
       </style>
       
     {% endblock %}
@@ -93,9 +115,9 @@
 
   <body>
     {% block header %}
-      <div id="header">
+      <div id="header" class="column container">
         <div class="menu">
-          <a href="/"><img class="logo" src="{{ MEDIA_URL }}global/twigra_logo.png" alt="" width="150" height="116" /></a>
+          <a href="/"><img class="logo" src="{{ MEDIA_URL }}global/twigra_logo.png" alt="logo" width="75" height="58" /></a>
 	  <h1 class="app_title">twigra</h1>
 	  <h4 class="app_title">tweet powered graphs</h4>
         </div>

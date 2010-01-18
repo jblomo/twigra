@@ -3,11 +3,11 @@
 
 {% block content %}
 <h1>New DMs</h1>
-<pre>
 <ul>
 {% for tweet in response_json %}
 <li>@{{ tweet.sender_screen_name }} = {{ tweet.text }}</li>
+{% empty %}
+<li>None</li>
 {% endfor %}
 </ul>
-</pre>
 {% endblock %}

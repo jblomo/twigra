@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block title %}{{ metric }} {{ follower.screen_name }} Timeline{% endblock %}
+
+{% block js %}
+<script src="http://www.google.com/jsapi" type="text/javascript"></script>
+<script>
+	google.load('visualization', '1', {'packages':['annotatedtimeline']});
+
+	google.setOnLoadCallback(drawChart);
+
+	function drawChart() {
+		var chart = new google.visualization.AnnotatedTimeLine(document.getElementById('chart_div'));
+		new google.visualization.Query('{% url graph.views.follower_metric_detail "jimblomo", "test" %}' + '.json').send(function(response) {
+			chart.draw(response.getDataTable(), {displayAnnotations: true, thickness: 4});
+		});
+	}
+</script>
+{% endblock %}
+
+{% block content %}
+<h1 class="metric">Want a cool graph like this one?</h1>
+<div id="info" class="span-6">
+
+	<div class="notice span-5 last">
+		<strong>Where's my graph?</strong> Uh oh, it looks like @twigra hasn't
+		processed any direct messages from you with your graph data.  Try reading the
+		<a href="/">instructions</a> again or emailing Jim.  In the meantime
+		checkout the <strong>sample graph</strong> to the right.</div>
+
+</div>
+
+<div id="chart_div" class="span-18 last" style="height: 250px">
+	<img src="{{ MEDIA_URL}}global/spinner.gif" alt="Loading graphs">Loading
+	graphs
+</div>
+
+{% endblock %}
+

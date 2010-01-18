@@ -2,17 +2,18 @@
 {% block title %}DMs{% endblock %}
 
 {% block content %}
-<h1>New DMs</h1>
-<pre>
-<ul>
+<h1>New Followers</h1>
 <h3>Twitter</h3>
+<ul>
 {% for user_id in response_json %}
 <li>{{ user_id }}</li>
 {% endfor %}
+</ul>
+
 <h3>Existing</h3>
+<ul>
 {% for user_id in followers %}
 <li>{{ user_id }}</li>
 {% endfor %}
 </ul>
-</pre>
 {% endblock %}

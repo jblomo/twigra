@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% block title %}{{ object.screen_name }}'s Metrics{% endblock %}
+
+{% block js %}
+<script type="text/javascript" src="{{ MEDIA_URL }}combined-{{ LANGUAGE_CODE }}.js"></script>
+<script src="http://www.google.com/jsapi" type="text/javascript"></script>
+<script>
+	google.load('visualization', '1', {'packages':['annotatedtimeline', 'imagesparkline']});
+
+	var last_metrics = {{ last_metrics|safe}};
+
+	google.setOnLoadCallback(drawChart);
+	function drawChart() {
+		var chart = new google.visualization.ImageSparkLine(document.getElementById('chart_div'));
+		new google.visualization.Query(location.href + '.json').send(function(response) {
+			chart.draw(response.getDataTable(), {showValueLabels: false, labelPosition: 'left'});
+
+			atl_url = "{% url graph.views.follower_metric_detail screen_name=object.screen_name, metric='__M__' %}"
+			google.visualization.events.addListener(chart, 'select', function(e) { 
+				window.location =  atl_url.replace('__M__', response.getDataTable().getColumnLabel(chart.getSelection().shift().column));
+			});
+
+			$('tr').each(function() { 
+				var metric = $($(this).children()[0]).text();
+				$(this).append('<td><div style="position:relative"><span class="notice">Last update: ' + last_metrics[metric].numerical +
+							' ' + last_metrics[metric].annotation + '</span></div></td>');
+				});
+		});
+
+
+	}
+</script>
+{% endblock %}
+
+{% block content %}
+<h1 class="metric">@{{ object.screen_name }}'s Quick Graphs</h1>
+<div id="chart_div" class="span-7" style="cursor: pointer;">
+	<img src="{{ MEDIA_URL}}global/spinner.gif" alt="Loading graphs">Loading
+	graphs
+</div>
+
+{% if old_metrics %}
+<h2>Archived metrics</h2>
+<ul>
+	{% for mname in old_metrics %}
+	<li>{{ mname }}</li>
+	{% endfor %}
+</ul>
+{% endif %}
+
+{% endblock %}
+

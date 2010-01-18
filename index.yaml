@@ -12,6 +12,42 @@ indexes:
 
 - kind: graph_datapoint
   properties:
+  - name: follower
+  - name: created_at
+    direction: desc
+
+- kind: graph_datapoint
+  properties:
+  - name: follower
+  - name: metric
+  - name: created_at
+
+- kind: graph_datapoint
+  properties:
+  - name: follower
+  - name: metric
+  - name: created_at
+    direction: desc
+
+- kind: graph_datapoint
+  properties:
+  - name: follower
+  - name: metric
+  - name: metric
+  - name: created_at
+    direction: desc
+
+- kind: graph_datapoint
+  properties:
+  - name: follower
+  - name: metric
+  - name: metric
+  - name: metric
+  - name: created_at
+    direction: desc
+
+- kind: graph_datapoint
+  properties:
   - name: metric
   - name: sender_screen_name
   - name: created_at

@@ -10,125 +10,10 @@
 	google.setOnLoadCallback(drawChart);
 
 	function drawChart() {
-		var jscode_data = new google.visualization.DataTable();
-jscode_data.addColumn('date', 'date', 'created_at');
-jscode_data.addColumn('number', 'mood', 'numerical');
-jscode_data.addColumn('string', 'Annotation', 'title1');
-jscode_data.addRows(60);
-jscode_data.setCell(20, 0, new Date(2009,11,1));
-jscode_data.setCell(20, 1, 2.1);
-jscode_data.setCell(20, 2, '');
-jscode_data.setCell(21, 0, new Date(2009,11,2));
-jscode_data.setCell(21, 1, 2.9);
-jscode_data.setCell(21, 2, '');
-jscode_data.setCell(22, 0, new Date(2009,11,3));
-jscode_data.setCell(22, 1, 6.8);
-jscode_data.setCell(22, 2, '');
-jscode_data.setCell(23, 0, new Date(2009,11,4));
-jscode_data.setCell(23, 1, 5.5);
-jscode_data.setCell(23, 2, '');
-jscode_data.setCell(24, 0, new Date(2009,11,5));
-jscode_data.setCell(24, 1, 0.9);
-jscode_data.setCell(24, 2, '');
-jscode_data.setCell(25, 0, new Date(2009,11,6));
-jscode_data.setCell(25, 1, 3.2);
-jscode_data.setCell(25, 2, '');
-jscode_data.setCell(26, 0, new Date(2009,11,7));
-jscode_data.setCell(26, 1, 0.6);
-jscode_data.setCell(26, 2, '');
-jscode_data.setCell(27, 0, new Date(2009,11,8));
-jscode_data.setCell(27, 1, 9.7);
-jscode_data.setCell(27, 2, '');
-jscode_data.setCell(28, 0, new Date(2009,11,9));
-jscode_data.setCell(28, 1, 8.5);
-jscode_data.setCell(28, 2, '');
-jscode_data.setCell(29, 0, new Date(2009,11,10));
-jscode_data.setCell(29, 1, 6.5);
-jscode_data.setCell(29, 2, 'overtime at work, but I got a lot done');
-jscode_data.setCell(30, 0, new Date(2009,11,11));
-jscode_data.setCell(30, 1, 3.2);
-jscode_data.setCell(30, 2, '');
-jscode_data.setCell(31, 0, new Date(2009,11,12));
-jscode_data.setCell(31, 1, 6.9);
-jscode_data.setCell(31, 2, '');
-jscode_data.setCell(32, 0, new Date(2009,11,13));
-jscode_data.setCell(32, 1, 8.2);
-jscode_data.setCell(32, 2, '');
-jscode_data.setCell(33, 0, new Date(2009,11,14));
-jscode_data.setCell(33, 1, 1.1);
-jscode_data.setCell(33, 2, '');
-jscode_data.setCell(34, 0, new Date(2009,11,15));
-jscode_data.setCell(34, 1, 5.2);
-jscode_data.setCell(34, 2, '');
-jscode_data.setCell(35, 0, new Date(2009,11,16));
-jscode_data.setCell(35, 1, 9.5);
-jscode_data.setCell(35, 2, '');
-jscode_data.setCell(36, 0, new Date(2009,11,17));
-jscode_data.setCell(36, 1, 1.2);
-jscode_data.setCell(36, 2, '');
-jscode_data.setCell(37, 0, new Date(2009,11,18));
-jscode_data.setCell(37, 1, 3.9);
-jscode_data.setCell(37, 2, '');
-jscode_data.setCell(38, 0, new Date(2009,11,19));
-jscode_data.setCell(38, 1, 6);
-jscode_data.setCell(38, 2, '');
-jscode_data.setCell(39, 0, new Date(2009,11,20));
-jscode_data.setCell(39, 1, 2.3);
-jscode_data.setCell(39, 2, '');
-jscode_data.setCell(40, 0, new Date(2009,11,21));
-jscode_data.setCell(40, 1, 2.2);
-jscode_data.setCell(40, 2, '');
-jscode_data.setCell(41, 0, new Date(2009,11,22));
-jscode_data.setCell(41, 1, 7.1);
-jscode_data.setCell(41, 2, '');
-jscode_data.setCell(42, 0, new Date(2009,11,23));
-jscode_data.setCell(42, 1, 9.4);
-jscode_data.setCell(42, 2, '');
-jscode_data.setCell(43, 0, new Date(2009,11,24));
-jscode_data.setCell(43, 1, 0.4);
-jscode_data.setCell(43, 2, '');
-jscode_data.setCell(44, 0, new Date(2009,11,25));
-jscode_data.setCell(44, 1, 1.8);
-jscode_data.setCell(44, 2, 'couldn\'t get to the gym today');
-jscode_data.setCell(45, 0, new Date(2009,11,26));
-jscode_data.setCell(45, 1, 1.5);
-jscode_data.setCell(45, 2, '');
-jscode_data.setCell(46, 0, new Date(2009,11,27));
-jscode_data.setCell(46, 1, 1.7);
-jscode_data.setCell(46, 2, '');
-jscode_data.setCell(47, 0, new Date(2009,11,28));
-jscode_data.setCell(47, 1, 7.7);
-jscode_data.setCell(47, 2, '');
-jscode_data.setCell(48, 0, new Date(2009,11,29));
-jscode_data.setCell(48, 1, 3.2);
-jscode_data.setCell(48, 2, '');
-jscode_data.setCell(49, 0, new Date(2009,11,30));
-jscode_data.setCell(49, 1, 5.4);
-jscode_data.setCell(49, 2, '');
-jscode_data.setCell(50, 0, new Date(2009,11,31));
-jscode_data.setCell(50, 1, 5.4);
-jscode_data.setCell(50, 2, '');
-jscode_data.setCell(51, 0, new Date(2010,0,1));
-jscode_data.setCell(51, 1, 8.8);
-jscode_data.setCell(51, 2, 'good score on my final exam');
-jscode_data.setCell(52, 0, new Date(2010,0,2));
-jscode_data.setCell(52, 1, 7.6);
-jscode_data.setCell(52, 2, '');
-jscode_data.setCell(53, 0, new Date(2010,0,3));
-jscode_data.setCell(53, 1, 7.6);
-jscode_data.setCell(53, 2, '');
-jscode_data.setCell(54, 0, new Date(2010,0,4));
-jscode_data.setCell(54, 1, 5.1);
-jscode_data.setCell(54, 2, '');
-jscode_data.setCell(55, 0, new Date(2010,0,5));
-jscode_data.setCell(55, 1, 2.5);
-jscode_data.setCell(55, 2, '');
-jscode_data.setCell(56, 0, new Date(2010,0,6));
-jscode_data.setCell(56, 1, 10);
-jscode_data.setCell(56, 2, 'crab dinner with the family');
-		
 		var chart = new google.visualization.AnnotatedTimeLine(document.getElementById('chart_div'));
-		chart.draw(jscode_data, {displayAnnotations: true});
+		new google.visualization.Query("{{ MEDIA_URL }}global/main.json").send(function(response) {
+			chart.draw(response.getDataTable(), {legendPosition: 'newRow', displayAnnotations: true, thickness: 4});
+		});
 	}
 </script>
 {% endblock %}
@@ -142,7 +27,7 @@ jscode_data.setCell(56, 2, 'crab dinner with the family');
 		<li><a href="http://www.twitter.com/twigra" target="_blank">Follow 
 			<span style="text-decoration: underline;">@twigra</span>
 			<img src="{{ MEDIA_URL }}global/follow_dots.png" alt="" />
-			<img src="{{ MEDIA_URL }}global/twigra_logo.png" alt="" width="150" height="116" />
+			<img src="{{ MEDIA_URL }}global/twigra_logo_large.png" alt="" width="150" height="116" />
 		</a>
 		</li>
 
@@ -167,12 +52,13 @@ jscode_data.setCell(56, 2, 'crab dinner with the family');
 </div>
 
 <script>
+	var metric_url = '{% url graph.views.follower_metric_detail "__T__", "__M__" %}' 
 	function direct_to_metrics() {
 		if( $('#screen_name').val() == 'twitter name' ) {
 			$('#go_error').html('Type in your Twitter screen name above');
 			$('#go_error').addClass('error');
 		} else {
-			window.location = '/graph/atimeline/' + $('#screen_name').val() + '/' + $('#metric').val();
+		window.location = metric_url.replace("__T__", $('#screen_name').val()).replace("__M__", $('#metric').val());
 		}
 	}
 </script>
