@@ -4,4 +4,4 @@ settings.add_app_media('combined-%(LANGUAGE_CODE)s.js',
 )
 
 settings.TWNAME = 'twigra'
-settings.TWPASSWORD = 'twitter.com'
+settings.TWPASSWORD = 'XXXXXXXXXXX'
